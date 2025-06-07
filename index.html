@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CHATBOT</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #2BC0E4, #EAECC6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .chat-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    width: 420px;
+    max-width: 90vw;
+    box-shadow: 0 15px 35px rgba(43, 192, 228, 0.3);
+    display: flex;
+    flex-direction: column;
+    height: 650px;
+  }
+
+  .chat-header {
+    padding: 25px 20px 10px;
+    text-align: center;
+    border-bottom: 2px solid #2BC0E4;
+  }
+
+  .chat-header h1 {
+    margin: 0;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2BC0E4;
+    letter-spacing: 3px;
+  }
+
+  .chat-header p {
+    margin: 5px 0 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #4a4a4a;
+    font-style: italic;
+  }
+
+  .chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 25px 20px;
+    color: #333;
+    background: #fefefe;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .message {
+    margin-bottom: 18px;
+    padding: 14px 18px;
+    border-radius: 20px;
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .user-message {
+    background: #2BC0E4;
+    color: white;
+    align-self: flex-end;
+  }
+
+  .bot-message {
+    background: #EAECC6;
+    color: #333;
+    align-self: flex-start;
+  }
+
+  .chat-input {
+    display: flex;
+    border-top: 1.5px solid #ddd;
+    padding: 15px 20px;
+    background: #fff;
+    border-radius: 0 0 20px 20px;
+  }
+
+  input[type="text"] {
+    flex-grow: 1;
+    border: 1.5px solid #2BC0E4;
+    padding: 12px 18px;
+    font-size: 1rem;
+    border-radius: 25px 0 0 25px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  input[type="text"]:focus {
+    border-color: #1694b5;
+  }
+
+  button {
+    background: #2BC0E4;
+    border: none;
+    color: white;
+    padding: 12px 22px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 0 25px 25px 0;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #1694b5;
+  }
+
+  /* Scrollbar styling */
+  .chat-messages::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb {
+    background-color: #2BC0E4;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>CHATBOT</h1>
+      <p>Effective AI Conversations</p>
+    </div>
+    <div id="chatMessages" class="chat-messages"></div>
+    <form id="chatForm" class="chat-input" autocomplete="off">
+      <input type="text" id="userInput" placeholder="Type your message here..." required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+<script>
+  const chatForm = document.getElementById('chatForm');
+  const chatMessages = document.getElementById('chatMessages');
+  const userInput = document.getElementById('userInput');
+
+  chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = userInput.value.trim();
+    if (!message) return;
+
+    addMessage(message, 'user-message');
+    userInput.value = '';
+
+    try {
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message})
+      });
+
+      const data = await response.json();
+      addMessage(data.response, 'bot-message');
+    } catch (error) {
+      addMessage("Sorry, something went wrong.", 'bot-message');
+    }
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+
+  function addMessage(text, className) {
+    const div = document.createElement('div');
+    div.className = `message ${className}`;
+    div.textContent = text;
+    chatMessages.appendChild(div);
+  }
+</script>
+</body>
+</html>
